@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>人脸检测系统 - 控制面板</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+</head>
+<body>
+    <div class="wrapper">
+        <!-- 侧边栏 -->
+        <nav id="sidebar">
+            <div class="sidebar-header">
+                <h3>人脸检测系统</h3>
+            </div>
+
+            <div class="user-info">
+                <i class="fas fa-user-circle"></i>
+                <span id="username-display">用户名</span>
+            </div>
+
+            <ul class="list-unstyled components">
+                <li class="active">
+                    <a href="#" data-page="home"><i class="fas fa-home"></i> 主页</a>
+                </li>
+                <li>
+                    <a href="#" data-page="database"><i class="fas fa-database"></i> 数据库管理</a>
+                </li>
+                <li>
+                    <a href="#" data-page="person-stats"><i class="fas fa-chart-line"></i> 人员统计</a>
+                </li>
+                <li>
+                    <a href="#" data-page="settings"><i class="fas fa-cog"></i> 设置</a>
+                </li>
+                <li>
+                    <a href="/logout"><i class="fas fa-sign-out-alt"></i> 登出</a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- 页面内容 -->
+        <div id="content">
+            <nav class="navbar navbar-expand-lg navbar-dark">
+                <div class="container-fluid">
+                    <button type="button" id="sidebarCollapse" class="btn btn-info">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <span class="navbar-text">
+                        <div class="system-time">
+                            <i class="far fa-clock"></i> <span id="current-time">2023-03-19 12:00:00</span>
+                        </div>
+                    </span>
+                </div>
+            </nav>
+            
+            <!-- 主页内容 -->
+            <div class="page-content active" id="home-page">
+                <div class="container-fluid">
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <div class="page-title">
+                                <h2><i class="fas fa-home"></i> 人脸检测控制面板</h2>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 统计卡片 -->
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <div class="card stats-card">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between">
+                                        <div>
+                                            <h5 class="card-title">当前检测到的人脸</h5>
+                                            <h2 class="mb-0" id="current-faces-count">0</h2>
+                                        </div>
+                                        <div class="stats-icon bg-primary">
+                                            <i class="fas fa-user-check"></i>
+                                        </div>
+                                    </div>
+                                    <p class="text-muted mt-3 mb-0" id="detection-timestamp">上次更新: 未开始检测</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card stats-card">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between">
+                                        <div>
+                                            <h5 class="card-title">总检测记录</h5>
+                                            <h2 class="mb-0" id="total-records">0</h2>
+                                        </div>
+                                        <div class="stats-icon bg-success">
+                                            <i class="fas fa-database"></i>
+                                        </div>
+                                    </div>
+                                    <p class="text-muted mt-3 mb-0">累计检测记录数</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card stats-card">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between">
+                                        <div>
+                                            <h5 class="card-title">系统状态</h5>
+                                            <h2 class="mb-0" id="system-status">未运行</h2>
+                                        </div>
+                                        <div class="stats-icon bg-danger">
+                                            <i class="fas fa-exclamation-circle"></i>
+                                        </div>
+                                    </div>
+                                    <p class="text-muted mt-3 mb-0" id="system-message">系统就绪，等待启动</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 视频流和控制面板 -->
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5><i class="fas fa-video"></i> 视频流</h5>
+                                </div>
+                                <div class="card-body text-center position-relative">
+                                    <div id="stream-overlay" class="text-center">
+                                        <div class="overlay-content">
+                                            <i class="fas fa-camera fa-3x mb-3"></i>
+                                            <h5>检测系统未运行</h5>
+                                            <p>点击"启动"按钮开始人脸识别</p>
+                                        </div>
+                                    </div>
+                                    <img id="video-stream" src="/static/img/placeholder.jpg" class="video-feed" alt="视频流">
+                                    
+                                    <!-- 添加摄像头控制按钮 -->
+                                    <div class="camera-controls mt-3">
+                                        <button id="start-detection-btn" class="btn btn-success me-2">
+                                            <i class="fas fa-play"></i> 启动检测
+                                        </button>
+                                        <button id="stop-detection-btn" class="btn btn-danger" disabled>
+                                            <i class="fas fa-stop"></i> 停止检测
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5><i class="fas fa-history"></i> 最近检测记录</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="recent-activity" id="recent-activity">
+                                        <div class="no-records-message">
+                                            <i class="fas fa-inbox"></i>
+                                            <p>暂无检测记录</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-footer">
+                                    <button id="view-all-btn" class="btn btn-outline-primary btn-sm w-100">查看所有记录</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 数据库管理内容 -->
+            <div class="page-content" id="database-page">
+                <div class="container-fluid">
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <div class="page-title">
+                                <h2><i class="fas fa-database"></i> 人脸数据库管理</h2>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 调整顺序：先显示人脸ID列表 -->
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h5><i class="fas fa-user-circle"></i> 人脸ID列表</h5>
+                                    <div class="btn-group">
+                                        <button id="refresh-faces-btn" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-sync-alt"></i> 刷新
+                                        </button>
+                                        <button id="clear-faces-btn" class="btn btn-sm btn-outline-danger ms-2">
+                                            <i class="fas fa-trash-alt"></i> 清空数据库
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="face-id-container" id="face-id-container">
+                                        <!-- 人脸ID将通过JavaScript动态添加 -->
+                                    </div>
+                                    <div id="no-faces" class="text-center p-4 d-none">
+                                        <i class="fas fa-user-times fa-3x mb-3 text-muted"></i>
+                                        <p>暂无人脸数据</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 然后显示人脸记录 -->
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h5><i class="fas fa-list"></i> 人脸记录</h5>
+                                    <div class="btn-group">
+                                        <button id="delete-all-records-btn" class="btn btn-sm btn-outline-danger">
+                                            <i class="fas fa-trash-alt"></i> 删除所有记录
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>ID</th>
+                                                    <th>捕获时间</th>
+                                                    <th>检测到的人脸数</th>
+                                                    <th>操作</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="records-table-body">
+                                                <!-- 记录将通过JavaScript动态添加 -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div id="no-records" class="text-center p-4 d-none">
+                                        <i class="fas fa-database fa-3x mb-3 text-muted"></i>
+                                        <p>暂无记录数据</p>
+                                    </div>
+                                    
+                                    <!-- 添加分页控件 -->
+                                    <div class="d-flex justify-content-between align-items-center mt-4">
+                                        <div>
+                                            <span class="me-2">每页显示:</span>
+                                            <select id="records-per-page" class="form-select form-select-sm d-inline-block w-auto">
+                                                <option value="10">10</option>
+                                                <option value="20">20</option>
+                                                <option value="30" selected>30</option>
+                                                <option value="50">50</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <span id="pagination-info" class="text-muted me-3">显示 1-30 共 ? 条</span>
+                                        </div>
+                                        <nav aria-label="人脸记录分页">
+                                            <ul class="pagination pagination-sm mb-0">
+                                                <li class="page-item disabled">
+                                                    <a class="page-link" href="#" id="prev-page">上一页</a>
+                                                </li>
+                                                <li class="page-item active" aria-current="page">
+                                                    <a class="page-link" href="#">1</a>
+                                                </li>
+                                                <li class="page-item">
+                                                    <a class="page-link" href="#">2</a>
+                                                </li>
+                                                <li class="page-item">
+                                                    <a class="page-link" href="#">3</a>
+                                                </li>
+                                                <li class="page-item">
+                                                    <a class="page-link" href="#" id="next-page">下一页</a>
+                                                </li>
+                                            </ul>
+                                        </nav>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 添加人员统计页面 -->
+            <div class="page-content" id="person-stats-page">
+                <div class="page-title">
+                    <h2><i class="fas fa-users"></i> 人员统计</h2>
+                </div>
+                
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <button id="refresh-stats-btn" class="btn btn-primary">
+                            <i class="fas fa-sync-alt"></i> 刷新统计数据
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-chart-line"></i> 情感趋势</h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="emotionChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-chart-bar"></i> 疲劳状态</h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="fatigueChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 人员统计卡片 -->
+                <div class="card mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">人员统计</h5>
+                        <button class="btn btn-primary btn-sm" onclick="refreshData()">
+                            <i class="fas fa-sync-alt"></i> 刷新
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>人员ID</th>
+                                        <th>检测次数</th>
+                                        <th>最后出现时间</th>
+                                        <th>情绪分布</th>
+                                        <th>平均疲劳度</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="person-stats-table">
+                                    <!-- 数据将通过JavaScript动态填充 -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 情绪趋势图表 -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">情绪趋势</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="emotion-trend-chart"></canvas>
+                    </div>
+                </div>
+
+                <!-- 疲劳趋势图表 -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">疲劳趋势</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="fatigue-trend-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 设置页面内容 -->
+            <div class="page-content" id="settings-page">
+                <div class="container-fluid">
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <div class="page-title">
+                                <h2><i class="fas fa-cog"></i> 系统设置</h2>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5><i class="fas fa-user-cog"></i> 用户设置</h5>
+                                </div>
+                                <div class="card-body">
+                                    <form id="change-password-form">
+                                        <div class="mb-3">
+                                            <label for="current-password" class="form-label">当前密码</label>
+                                            <input type="password" class="form-control" id="current-password" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="new-password" class="form-label">新密码</label>
+                                            <input type="password" class="form-control" id="new-password" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="confirm-new-password" class="form-label">确认新密码</label>
+                                            <input type="password" class="form-control" id="confirm-new-password" required>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary">更改密码</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5><i class="fas fa-cog"></i> 检测设置</h5>
+                                </div>
+                                <div class="card-body">
+                                    <form id="settings-form">
+                                        <div class="mb-3">
+                                            <label class="form-label">检测置信度阈值</label>
+                                            <input type="range" class="form-range" id="confidence-threshold" min="0" max="100" step="1">
+                                            <div class="text-center" id="confidence-value">50%</div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">人脸框内边距</label>
+                                            <input type="range" class="form-range" id="face-padding" min="0" max="50" step="1">
+                                            <div class="text-center" id="padding-value">10px</div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">帧跳过数量</label>
+                                            <input type="range" class="form-range" id="frame-skip" min="0" max="5" step="1">
+                                            <div class="text-center" id="skip-value">0</div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" id="enable-frame-skip">
+                                                <label class="form-check-label" for="enable-frame-skip">启用帧跳过</label>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" id="save-detection-images">
+                                                <label class="form-check-label" for="save-detection-images">保存检测图片</label>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" id="auto-cleanup">
+                                                <label class="form-check-label" for="auto-cleanup">自动清理过期数据</label>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" id="enable-notifications">
+                                                <label class="form-check-label" for="enable-notifications">启用通知提醒</label>
+                                            </div>
+                                        </div>
+                                        <div class="d-grid">
+                                            <button type="submit" class="btn btn-primary">保存设置</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-4">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5><i class="fas fa-info-circle"></i> 系统信息</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <p><strong>系统版本：</strong> 1.0.0</p>
+                                            <p><strong>模型版本：</strong> YOLOv7-face</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p><strong>开发者：</strong> AI团队</p>
+                                            <p><strong>最后更新：</strong> 2023-03-19</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 设置卡片 -->
+                    <div class="col-12 col-md-6 mb-4">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5><i class="fas fa-cog me-2"></i>系统设置</h5>
+                                <button id="open-settings-btn" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-sliders-h me-1"></i>高级设置
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label for="confidence-threshold" class="form-label">检测置信度阈值: <span id="confidence-value">0.5</span></label>
+                                    <input type="range" class="form-range" id="confidence-threshold" min="0.1" max="0.9" step="0.1" value="0.5">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="similarity-threshold" class="form-label">人脸相似度阈值: <span id="similarity-value">0.6</span></label>
+                                    <input type="range" class="form-range" id="similarity-threshold" min="0.1" max="0.9" step="0.1" value="0.6">
+                                </div>
+                                <button id="apply-settings-btn" class="btn btn-success"><i class="fas fa-check me-1"></i>应用设置</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 删除确认模态框 -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">确认删除</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>您确定要删除此记录吗？此操作无法撤销。</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-danger" id="confirm-delete-btn">删除</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 在删除确认模态框后添加摄像头启动提示模态框 -->
+    <div class="modal fade camera-start-modal" id="cameraStartModal" tabindex="-1" aria-labelledby="cameraStartModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cameraStartModalLabel"><i class="fas fa-camera"></i> 摄像头启动中</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <i class="fas fa-video camera-icon"></i>
+                    <h4 class="mb-3">系统正在启动摄像头</h4>
+                    <p class="mb-1">请稍候，人脸检测系统正在初始化...</p>
+                    <p class="text-muted small mb-3">检测开始后请保持面部在摄像头视野范围内</p>
+                    <div class="progress">
+                        <div id="camera-load-progress" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%"></div>
+                    </div>
+                    <p class="text-muted small mt-3 mb-0" id="camera-status-text">正在连接摄像头...</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" data-bs-dismiss="modal">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加清空数据库确认模态框 -->
+    <div class="modal fade" id="clearDatabaseModal" tabindex="-1" aria-labelledby="clearDatabaseModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="clearDatabaseModalLabel"><i class="fas fa-exclamation-triangle"></i> 危险操作确认</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mb-3">
+                        <i class="fas fa-trash-alt text-danger fa-4x mb-3"></i>
+                        <h4>确定要清空人脸数据库吗？</h4>
+                    </div>
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-circle"></i> 警告：此操作将永久删除所有人脸数据及图像，且无法恢复！
+                    </div>
+                    <p>清空数据库后：</p>
+                    <ul>
+                        <li>所有人脸记录将被删除</li>
+                        <li>人脸ID序列将被重置</li>
+                        <li>所有人脸图像文件将被删除</li>
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-danger" id="confirm-clear-btn">
+                        <i class="fas fa-trash-alt"></i> 确认清空
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加设置模态框 -->
+    <div class="modal fade" id="settingsModal" tabindex="-1" aria-labelledby="settingsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="settingsModalLabel">
+                        <i class="fas fa-cogs me-2"></i>检测设置
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="settings-section mb-4">
+                        <h6 class="settings-title">检测设置</h6>
+                        <div class="mb-3">
+                            <label for="detection-threshold" class="form-label d-flex justify-content-between">
+                                <span>检测阈值</span>
+                                <span id="detection-threshold-value">0.5</span>
+                            </label>
+                            <input type="range" class="form-range" min="0.3" max="0.9" step="0.05" id="detection-threshold" value="0.5">
+                            <small class="form-text text-muted">较低的值可以检测更多人脸，但可能增加误检率</small>
+                        </div>
+                        <div class="mb-3">
+                            <label for="face-padding" class="form-label d-flex justify-content-between">
+                                <span>人脸边距</span>
+                                <span id="face-padding-value">5</span>
+                            </label>
+                            <input type="range" class="form-range" min="0" max="30" step="1" id="face-padding" value="5">
+                            <small class="form-text text-muted">调整人脸边界框的扩展区域</small>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-section mb-4">
+                        <h6 class="settings-title">匹配设置</h6>
+                        <div class="mb-3">
+                            <label for="similarity-threshold" class="form-label d-flex justify-content-between">
+                                <span>相似度阈值</span>
+                                <span id="similarity-threshold-value">0.6</span>
+                            </label>
+                            <input type="range" class="form-range" min="0.4" max="0.8" step="0.05" id="similarity-threshold" value="0.6">
+                            <small class="form-text text-muted">较高的值需要更精确的匹配，较低的值可能导致误匹配</small>
+                        </div>
+                        <div class="mb-3">
+                            <label for="vote-threshold" class="form-label d-flex justify-content-between">
+                                <span>投票阈值</span>
+                                <span id="vote-threshold-value">2</span>
+                            </label>
+                            <input type="range" class="form-range" min="1" max="5" step="1" id="vote-threshold" value="2">
+                            <small class="form-text text-muted">投票系统中需要达到的最小票数</small>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-section mb-2">
+                        <h6 class="settings-title">性能设置</h6>
+                        <div class="form-check form-switch mb-2">
+                            <input class="form-check-input" type="checkbox" id="enable-preprocessing">
+                            <label class="form-check-label" for="enable-preprocessing">启用图像预处理</label>
+                            <small class="form-text text-muted d-block">改善光照条件不佳的情况下的识别效果，但会增加处理负担</small>
+                        </div>
+                        <div class="form-check form-switch mb-2">
+                            <input class="form-check-input" type="checkbox" id="enable-voting">
+                            <label class="form-check-label" for="enable-voting">启用投票机制</label>
+                            <small class="form-text text-muted d-block">可提高分类准确度，但会降低识别速度</small>
+                        </div>
+                        <div class="form-check form-switch mb-2">
+                            <input class="form-check-input" type="checkbox" id="use-large-model">
+                            <label class="form-check-label" for="use-large-model">使用高精度模型</label>
+                            <small class="form-text text-muted d-block">使用更准确但更慢的模型进行人脸识别</small>
+                        </div>
+                    </div>
+                    
+                    <!-- 添加增强功能设置区块 -->
+                    <div class="settings-section mb-2">
+                        <h6 class="settings-title">增强功能</h6>
+                        <div class="form-check form-switch mb-2">
+                            <input class="form-check-input" type="checkbox" id="enable-emotion-detection">
+                            <label class="form-check-label" for="enable-emotion-detection">启用情感检测</label>
+                            <small class="form-text text-muted d-block">检测并显示人脸情感状态（喜怒哀乐等），会增加系统负担</small>
+                        </div>
+                        <div class="form-check form-switch mb-2">
+                            <input class="form-check-input" type="checkbox" id="enable-fatigue-detection">
+                            <label class="form-check-label" for="enable-fatigue-detection">启用疲劳检测</label>
+                            <small class="form-text text-muted d-block">检测用户疲劳状态并发出警告，会增加系统负担</small>
+                        </div>
+                        <div class="form-check form-switch mb-2">
+                            <input class="form-check-input" type="checkbox" id="enable-frame-skip" checked>
+                            <label class="form-check-label" for="enable-frame-skip">启用帧跳过</label>
+                            <small class="form-text text-muted d-block">间隔处理视频帧以提高性能，每帧仍会显示结果</small>
+                        </div>
+                        <div class="mb-3">
+                            <label for="frame-skip-value" class="form-label d-flex justify-content-between">
+                                <span>帧跳过数量</span>
+                                <span id="frame-skip-value">2</span>
+                            </label>
+                            <input type="range" class="form-range" min="0" max="5" step="1" id="frame-skip" value="2">
+                            <small class="form-text text-muted d-block">数值越高性能越好，但可能影响检测流畅度</small>
+                        </div>
+                    </div>
+                    
+                    <!-- 添加性能警告 -->
+                    <div class="alert alert-warning mt-3" role="alert">
+                      <i class="fas fa-exclamation-triangle"></i> 高精度设置可能导致系统卡顿，请根据您的硬件性能进行调整。
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" id="save-settings-btn">保存设置</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加删除所有记录确认模态框 -->
+    <div class="modal fade" id="deleteAllRecordsModal" tabindex="-1" aria-labelledby="deleteAllRecordsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="deleteAllRecordsModalLabel"><i class="fas fa-exclamation-triangle"></i> 危险操作确认</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mb-3">
+                        <i class="fas fa-trash-alt text-danger fa-4x mb-3"></i>
+                        <h4>确定要删除所有人脸记录吗？</h4>
+                    </div>
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-circle"></i> 警告：此操作将删除所有检测记录，但不会删除人脸ID和图像！
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-danger" id="confirm-delete-all-records-btn">
+                        <i class="fas fa-trash-alt"></i> 确认删除
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加统计详情模态框 -->
+    <div class="modal fade" id="statsDetailsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">人员统计详情</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>情感历史</h6>
+                            <canvas id="emotionHistoryChart"></canvas>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>疲劳历史</h6>
+                            <canvas id="fatigueHistoryChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <h6>详细信息</h6>
+                            <pre id="statsDetailsJson" class="bg-light p-3 rounded"></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/static/js/dashboard.js"></script>
+
+    <!-- 在JavaScript部分添加刷新函数 -->
+    <script>
+    // 自动更新定时器
+    let autoUpdateTimer = null;
+
+    // 开始自动更新
+    function startAutoUpdate() {
+        if (autoUpdateTimer) {
+            clearInterval(autoUpdateTimer);
+        }
+        autoUpdateTimer = setInterval(refreshData, 30000); // 每30秒更新一次
+    }
+
+    // 停止自动更新
+    function stopAutoUpdate() {
+        if (autoUpdateTimer) {
+            clearInterval(autoUpdateTimer);
+            autoUpdateTimer = null;
+        }
+    }
+
+    // 刷新数据
+    async function refreshData() {
+        try {
+            // 显示加载动画
+            const refreshBtn = document.querySelector('.btn-primary');
+            const originalText = refreshBtn.innerHTML;
+            refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 刷新中...';
+            refreshBtn.disabled = true;
+
+            // 并行加载所有数据
+            await Promise.all([
+                loadDetectionStats(),
+                loadPersonStatsData()
+            ]);
+
+            // 恢复按钮状态
+            refreshBtn.innerHTML = originalText;
+            refreshBtn.disabled = false;
+
+            // 显示成功提示
+            showToast('数据已更新', 'success');
+        } catch (error) {
+            console.error('刷新数据失败:', error);
+            showToast('刷新数据失败', 'error');
+        }
+    }
+
+    // 加载检测统计
+    async function loadDetectionStats() {
+        try {
+            const response = await fetch('/detection_stats');
+            const data = await response.json();
+            
+            if (data.success) {
+                // 更新当前检测到的人脸数
+                document.getElementById('current-faces-count').textContent = data.current_faces;
+                // 更新总检测记录数
+                document.getElementById('total-records').textContent = data.total_records;
+                // 更新最近检测记录
+                updateRecentRecords(data.recent_records);
+            }
+        } catch (error) {
+            console.error('加载检测统计失败:', error);
+        }
+    }
+
+    // 加载人员统计数据
+    async function loadPersonStatsData() {
+        try {
+            const response = await fetch('/person_stats');
+            const data = await response.json();
+            
+            if (data.success) {
+                updatePersonStatsTable(data.stats);
+                updateEmotionTrendChart(data.stats);
+                updateFatigueTrendChart(data.stats);
+            }
+        } catch (error) {
+            console.error('加载人员统计数据失败:', error);
+        }
+    }
+
+    // 更新人员统计表格
+    function updatePersonStatsTable(stats) {
+        const tbody = document.getElementById('person-stats-table');
+        tbody.innerHTML = '';
+        
+        if (stats.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center">暂无数据</td></tr>';
+            return;
+        }
+        
+        stats.forEach(stat => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${stat.face_id}</td>
+                <td>${stat.total_detections}</td>
+                <td>${formatDateTime(stat.last_seen)}</td>
+                <td>${formatEmotionDistribution(stat.emotion_distribution)}</td>
+                <td>${stat.average_fatigue.toFixed(1)}%</td>
+            `;
+            tbody.appendChild(row);
+        });
+    }
+
+    // 格式化情绪分布
+    function formatEmotionDistribution(distribution) {
+        if (!distribution || Object.keys(distribution).length === 0) {
+            return '暂无数据';
+        }
+        
+        return Object.entries(distribution)
+            .map(([emotion, percentage]) => `${emotion}: ${percentage.toFixed(1)}%`)
+            .join(', ');
+    }
+
+    // 更新情绪趋势图表
+    function updateEmotionTrendChart(stats) {
+        const ctx = document.getElementById('emotion-trend-chart').getContext('2d');
+        
+        // 准备数据
+        const datasets = [];
+        const emotions = new Set();
+        
+        stats.forEach(stat => {
+            if (stat.emotion_history) {
+                stat.emotion_history.forEach(record => {
+                    emotions.add(record.emotion);
+                });
+            }
+        });
+        
+        emotions.forEach(emotion => {
+            const data = stats.map(stat => {
+                const records = stat.emotion_history.filter(r => r.emotion === emotion);
+                return records.length > 0 ? records[records.length - 1].confidence : 0;
+            });
+            
+            datasets.push({
+                label: emotion,
+                data: data,
+                borderColor: getEmotionColor(emotion),
+                fill: false
+            });
+        });
+        
+        // 创建图表
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: stats.map(stat => stat.face_id),
+                datasets: datasets
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100
+                    }
+                }
+            }
+        });
+    }
+
+    // 更新疲劳趋势图表
+    function updateFatigueTrendChart(stats) {
+        const ctx = document.getElementById('fatigue-trend-chart').getContext('2d');
+        
+        const data = stats.map(stat => {
+            if (stat.fatigue_history && stat.fatigue_history.length > 0) {
+                return stat.fatigue_history[stat.fatigue_history.length - 1].level;
+            }
+            return 0;
+        });
+        
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: stats.map(stat => stat.face_id),
+                datasets: [{
+                    label: '疲劳度',
+                    data: data,
+                    borderColor: '#ff6384',
+                    backgroundColor: 'rgba(255, 99, 132, 0.1)',
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100
+                    }
+                }
+            }
+        });
+    }
+
+    // 获取情绪对应的颜色
+    function getEmotionColor(emotion) {
+        const colors = {
+            'happy': '#4CAF50',
+            'sad': '#2196F3',
+            'angry': '#F44336',
+            'neutral': '#9E9E9E',
+            'surprise': '#FFC107',
+            'fear': '#9C27B0',
+            'disgust': '#795548'
+        };
+        return colors[emotion] || '#000000';
+    }
+
+    // 格式化日期时间
+    function formatDateTime(timestamp) {
+        const date = new Date(timestamp);
+        return date.toLocaleString();
+    }
+
+    // 显示提示消息
+    function showToast(message, type = 'info') {
+        const toast = document.createElement('div');
+        toast.className = `toast align-items-center text-white bg-${type} border-0`;
+        toast.setAttribute('role', 'alert');
+        toast.setAttribute('aria-live', 'assertive');
+        toast.setAttribute('aria-atomic', 'true');
+        
+        toast.innerHTML = `
+            <div class="d-flex">
+                <div class="toast-body">
+                    ${message}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        `;
+        
+        document.body.appendChild(toast);
+        const bsToast = new bootstrap.Toast(toast);
+        bsToast.show();
+        
+        toast.addEventListener('hidden.bs.toast', () => {
+            toast.remove();
+        });
+    }
+
+    // 页面加载完成后启动自动更新
+    document.addEventListener('DOMContentLoaded', () => {
+        startAutoUpdate();
+        refreshData(); // 立即加载一次数据
+    });
+
+    // 页面卸载前停止自动更新
+    window.addEventListener('beforeunload', () => {
+        stopAutoUpdate();
+    });
+    </script>
+</body>
+</html> 

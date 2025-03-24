@@ -1,0 +1,43 @@
+# .gitignore
+# 忽略数据库文件
+*.db
+# 忽略临时/部分下载文件
+*.partial
+# 忽略 IDE 配置文件（如 .idea）
+.idea/
+# 忽略 node_modules（如果存在）
+models/yolov7-face/data/widerface/
+models/emotion_detection/weights
+models/fatigue_detection/weights
+models/yolov7-face/weights
+frontend/node_modules/
+models/yolov7-face/runs
+*.pt
+*.weights
+*.txt
+*.jpg
+*.whl
+# Python 相关
+__pycache__/
+*.py[cod]
+*.egg-info/
+venv/
+
+# Node.js 相关
+node_modules/
+*.log
+.npm/
+
+# 开发环境
+.env
+.vscode/
+.idea/
+
+# 前端构建产物
+build/
+dist/
+.cache/
+
+# 系统文件
+.DS_Store
+Thumbs.db
