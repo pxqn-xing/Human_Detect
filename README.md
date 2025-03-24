@@ -74,7 +74,7 @@ python start.py
 
 ## 贡献者
 
-- AI团队
+- wxy
 
 ## 许可证
 
